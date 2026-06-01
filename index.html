@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AXIOM_PET_TRANSLATE // Analizador Biométrico Mascotas</title>
     
+    <!-- FUENTES PREMIUM Y LIBRERÍAS DE LATENCIA ULTRA-BAJA VIA CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Urbanist:wght@700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- GSAP para microinteracciones físicas de muelles -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <!-- Lenis para scroll fluido de seda -->
     <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <!-- Canvas Confetti para celebración de registro -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <!-- Supabase CDN Oficial -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -149,7 +154,7 @@
             transform: translateY(0);
         }
 
-        /* Avatar reactivo (Simulación de la máquina de estados de Rive) */
+        /* Avatar reactivo */
         .avatar-state-engine {
             width: 80px;
             height: 80px;
@@ -201,6 +206,31 @@
             transform: scale(0.98);
         }
 
+        /* Botones de Proveedores OAuth (Google / X) */
+        .btn-oauth {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+        }
+        .btn-oauth:hover {
+            background: #ffffff;
+            border-color: var(--accent-pet);
+            transform: translateY(-1px);
+        }
+
         /* Muro de Autenticación Premium con refracción óptica */
         #premium-auth-wall::before {
             content: '';
@@ -216,7 +246,7 @@
             left: 150%;
         }
 
-        /* Lista de Historial Médico (AutoAnimate target) */
+        /* Lista de Historial Médico */
         .history-item {
             display: flex;
             justify-content: space-between;
@@ -239,6 +269,7 @@
 
     <main>
         
+        <!-- HEADER HUD DE IDENTIDAD -->
         <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="width: 36px; height: 36px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;">
@@ -254,6 +285,7 @@
             </div>
         </header>
 
+        <!-- PANEL DESCENTRALIZADO CREATOR DE API KEY -->
         <div class="api-key-hud glass-panel" style="padding: 10px 14px; border-radius: 16px;">
             <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
                 <label style="font-size: 10px; font-family: monospace; font-weight: bold; color: var(--text-muted); display: flex; justify-content: space-between;">
@@ -267,6 +299,7 @@
             </button>
         </div>
 
+        <!-- BARRA FLUIDA DE CONTROL DE PESTAÑAS (TAB SYSTEM) -->
         <nav class="tab-nav-bar">
             <button class="tab-btn active" id="tab-free" onclick="switchTabEngine('free')">
                 <i data-lucide="scan-eye" style="width: 16px; height: 16px;"></i>Análisis IA
@@ -279,8 +312,10 @@
             </button>
         </nav>
 
+        <!-- ================= PANEL PRINCIPAL CONTENEDOR DE VISTAS ================= -->
         <div class="glass-panel" id="main-viewport-chasis">
             
+            <!-- VISTA A: ANALIZADOR GRATUITO DE EXPRESIONES (IA ABIERTA) -->
             <div id="view-free" class="view-pane active">
                 <div class="dropzone-container" id="dropzone-media" onclick="document.getElementById('file-input-hidden').click()">
                     <i data-lucide="cloud-upload" style="width: 32px; height: 32px; color: var(--text-muted); margin-bottom: 8px;"></i>
@@ -289,6 +324,7 @@
                     <input type="file" id="file-input-hidden" style="display: none;" accept="image/*,video/*" onchange="processMascotaImageEngine(this.files[0])">
                 </div>
 
+                <!-- AVATAR REACTIVO DE MÁQUINA DE ESTADOS -->
                 <div class="avatar-state-engine" id="pet-avatar-mesh">🐾</div>
                 
                 <div id="analysis-result-box" style="display: none; text-align: center; border-top: 1px solid var(--card-border); padding-top: 16px; margin-top: 12px;">
@@ -298,6 +334,7 @@
                 </div>
             </div>
 
+            <!-- VISTA B: ESCUCHA DE AUDIO EN TIEMPO REAL -->
             <div id="view-audio" class="view-pane">
                 <div style="text-align: center; padding: 20px 10px;">
                     <div style="width: 56px; height: 56px; background: rgba(99,102,241,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--accent-pet);">
@@ -309,6 +346,7 @@
                 </div>
             </div>
 
+            <!-- VISTA C: HISTORIAL CLÍNICO Y ANOMALÍAS -->
             <div id="view-clinical" class="view-pane">
                 <h3 style="font-family: 'Urbanist', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 12px;">Histórico Médico Completo</h3>
                 <div id="clinical-history-list">
@@ -318,11 +356,28 @@
                 </div>
             </div>
 
+            <!-- ================= MURO DE LOGIN/REGISTRO PREMIUM (SUPABASE AUTH GATE + OAUTH) ================= -->
             <div id="premium-auth-wall" style="display: none; flex-direction: column; gap: 16px; margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 20px;">
-                <div style="text-align: center; margin-bottom: 8px;">
+                <div style="text-align: center; margin-bottom: 4px;">
                     <span style="font-family: monospace; font-size: 9px; background: rgba(99,102,241,0.1); color: var(--accent-pet); padding: 3px 8px; border-radius: 6px; font-weight: 700;">ACCESO PREMIUM PROTEGIDO</span>
                     <h3 style="font-family: 'Urbanist', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 6px;">Desbloquea el Panel Avanzado</h3>
-                    <p style="color: var(--text-muted); font-size: 12px;">Crea una cuenta o inicia sesión vía Supabase para ver el historial y análisis de audio.</p>
+                    <p style="color: var(--text-muted); font-size: 12px;">Accede de forma inmediata mediante redes o credenciales Supabase.</p>
+                </div>
+
+                <!-- PASARELAS DIRECTAS OAUTH MASIVAS -->
+                <div style="display: flex; gap: 10px; margin-bottom: 4px;">
+                    <button class="btn-oauth" onclick="executeSupabaseOAuthEngine('google')">
+                        <i data-lucide="chrome" style="width: 14px; height: 14px; color: #ea4335;"></i> Google
+                    </button>
+                    <button class="btn-oauth" onclick="executeSupabaseOAuthEngine('twitter')">
+                        <i data-lucide="twitter" style="width: 14px; height: 14px; color: #1da1f2;"></i> Cuenta X
+                    </button>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px; margin: 4px 0;">
+                    <div style="flex: 1; height: 1px; background: rgba(15,23,42,0.06);"></div>
+                    <span style="font-family: monospace; font-size: 9px; color: var(--text-muted);">O CON EMAIL</span>
+                    <div style="flex: 1; height: 1px; background: rgba(15,23,42,0.06);"></div>
                 </div>
 
                 <input type="email" id="auth-email" class="input-militar" placeholder="Introduce tu email corporativo">
@@ -336,12 +391,14 @@
 
         </div>
 
+        <!-- CERRAR SESIÓN -->
         <button id="btn-logout-premium" class="glass-panel" style="display: none; width: 100%; margin-top: 16px; padding: 12px; text-align: center; font-family: monospace; font-size: 11px; font-weight: bold; color: #ef4444; border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.02); cursor: pointer;" onclick="logoutSessionEngine()">
             <i data-lucide="log-out" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i> CERRAR SESIÓN SEGURA
         </button>
 
     </main>
 
+    <!-- ================= PROTOCOLO DE CONEXIÓN Y LOGICA MAESTRA ================= -->
     <script>
         // === 1. PARÁMETROS CRÍTICOS Y BACKEND CREDENTIALS ===
         const SUPABASE_URL = "https://vqgkzwnmcibwvfmnayhz.supabase.co";
@@ -356,12 +413,21 @@
         function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
         requestAnimationFrame(raf);
 
-        // Inicialización de Supabase Client de forma defensiva
+        // Inicialización defensiva de Supabase Client
         if (typeof supabase !== 'undefined') {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
-        // === 2. GESTIÓN PERSISTENTE DE LA CLAVE DE ENTORNO LOCAL (LOCALSTORAGE) ===
+        // Interceptor de sesión automático para capturar retornos OAuth (Google/X)
+        async function checkActiveSessionEngine() {
+            if (!supabaseClient) return;
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                successSessionLoginUnlock(session.user, false);
+            }
+        }
+
+        // === 2. GESTIÓN PERSISTENTE DE LA CLAVE DE ENTORNO LOCAL ===
         function loadLocalGroqKeyEngine() {
             const savedKey = localStorage.getItem('groq_api_key');
             if (savedKey) {
@@ -379,7 +445,7 @@
             alert("API Key eliminada con éxito de la memoria segura del navegador.");
         }
 
-        // === 3. ORQUESTADOR DE MANIPULACIÓN CINÉTICA DE PESTAÑAS (TAB ENGINE) ===
+        // === 3. ORQUESTADOR DE MANIPULACIÓN CINÉTICA DE PESTAÑAS ===
         function switchTabEngine(targetTab) {
             if ((targetTab === "audio" || targetTab === "clinical") && !authenticatedUser) {
                 document.getElementById('premium-auth-wall').style.display = 'flex';
@@ -421,7 +487,6 @@
 
             resultBox.style.display = 'block';
 
-            // Guardia de seguridad: Si no hay clave en localStorage, frena la ejecución
             if (!userKey || userKey.trim() === '') {
                 verdictTitle.innerText = "SISTEMA DETENIDO";
                 verdictTitle.style.color = "var(--neon-warn)";
@@ -438,7 +503,6 @@
             
             gsap.to(avatarMesh, { rotate: 360, duration: 1.5, repeat: -1, ease: "none" });
 
-            // Canalización del prompt analítico adaptado hacia el modelo Groq descentralizado
             fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {
@@ -484,7 +548,7 @@
             });
         }
 
-        // === 5. SISTEMA DE AUTENTICACIÓN PREMIUM DE SUPABASE GATE ===
+        // === 5. SISTEMA DE AUTENTICACIÓN: CREDENCIALES TRADICIONALES Y PASARELAS OAUTH ===
         async function executeSupabaseAuth(actionType) {
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value.trim();
@@ -515,6 +579,25 @@
                 }
             } catch (error) {
                 alert(`Fallo en Auth: ${error.message}`);
+            }
+        }
+
+        // Lógica de autenticación OAuth para Google y X (Twitter)
+        async function executeSupabaseOAuthEngine(providerName) {
+            if (!supabaseClient) {
+                alert("Error crítico: Librería Supabase ausente.");
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: providerName,
+                    options: {
+                        redirectTo: window.location.origin // Redirige de vuelta a este archivo monolítico
+                    }
+                });
+                if (error) throw error;
+            } catch (error) {
+                alert(`Fallo en pasarela OAuth [${providerName}]: ${error.message}`);
             }
         }
 
@@ -579,6 +662,7 @@
         // === 8. ARRANQUE ORDENADO DEL ENTORNO ===
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalGroqKeyEngine();
+            checkActiveSessionEngine(); // Evalúa si viene de un callback exitoso de Google/X
             lucide.createIcons();
         });
     </script>
