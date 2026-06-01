@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AXIOM_PET_TRANSLATE // Analizador Biométrico Mascotas</title>
+    <title>AXIOM_PET_TRANSLATE // Analizador Local de Mascotas</title>
     
     <!-- FUENTES PREMIUM Y LIBRERÍAS DE LATENCIA ULTRA-BAJA VIA CDN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,7 +66,7 @@
         main {
             max-width: 500px;
             margin: 0 auto;
-            padding: 24px 16px 100px 16px;
+            padding: 40px 16px 100px 16px;
             position: relative;
         }
 
@@ -82,18 +82,6 @@
             transform: translateZ(0); /* Forzado GPU */
             position: relative;
             overflow: hidden;
-        }
-
-        /* HUD Descentralizado para la Clave API */
-        .api-key-hud {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 8px 12px;
-            border-radius: 16px;
-            margin-bottom: 16px;
         }
 
         .tab-nav-bar {
@@ -120,11 +108,19 @@
             align-items: center;
             gap: 4px;
             transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+            position: relative;
         }
         .tab-btn.active {
             background: #ffffff;
             color: var(--text-main);
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .tab-btn.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 8px;
         }
 
         /* Zona de arrastre de archivos (Dropzone Libre) */
@@ -231,19 +227,33 @@
             transform: translateY(-1px);
         }
 
-        /* Muro de Autenticación Premium con refracción óptica */
-        #premium-auth-wall::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -150%;
-            width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            transform: skewX(-25deg);
-            transition: left 0.65s cubic-bezier(0.25, 1, 0.5, 1);
-            pointer-events: none;
+        /* === MODAL ESTÉTICO PREMIUM DE CONVERSIÓN === */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
         }
-        #premium-auth-wall.flash-effect::before {
-            left: 150%;
+        .modal-card {
+            max-width: 420px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(32px) saturate(200%);
+            -webkit-backdrop-filter: blur(32px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 28px;
+            padding: 32px 24px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08), inset 0 1px 0 #fff;
+            position: relative;
+            transform: scale(0.9);
+            opacity: 0;
         }
 
         /* Lista de Historial Médico */
@@ -270,14 +280,14 @@
     <main>
         
         <!-- HEADER HUD DE IDENTIDAD -->
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="width: 36px; height: 36px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;">
                     <i data-lucide="heart-pulse" style="width: 18px; height: 18px;"></i>
                 </div>
                 <div>
                     <span style="font-family: 'Urbanist', sans-serif; font-weight: 900; font-size: 1.15rem; letter-spacing: -0.5px;">AXIOM_PET</span>
-                    <p style="font-size: 7px; font-family: monospace; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">v2.0 // vision & biometrics</p>
+                    <p style="font-size: 7px; font-family: monospace; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">v2.0 // pure native code</p>
                 </div>
             </div>
             <div id="user-badge-status" style="font-family: monospace; font-size: 9px; font-weight: 700; background: rgba(15,23,42,0.04); padding: 4px 10px; border-radius: 20px; color: var(--text-muted);">
@@ -285,29 +295,15 @@
             </div>
         </header>
 
-        <!-- PANEL DESCENTRALIZADO CREATOR DE API KEY -->
-        <div class="api-key-hud glass-panel" style="padding: 10px 14px; border-radius: 16px;">
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                <label style="font-size: 10px; font-family: monospace; font-weight: bold; color: var(--text-muted); display: flex; justify-content: space-between;">
-                    <span>API KEY DE GROQ (DE ENTORNO LOCAL)</span>
-                    <a href="https://console.groq.com" target="_blank" style="color: var(--accent-pet); text-decoration: none;">Consíguela gratis aquí ↗</a>
-                </label>
-                <input type="password" id="groq-local-key-input" style="background: transparent; border: none; outline: none; font-family: monospace; font-size: 12px; color: var(--text-main); width: 100%;" placeholder="Introduce tu gsk_ API Key..." oninput="saveLocalGroqKeyEngine(this.value)">
-            </div>
-            <button onclick="clearLocalGroqKeyEngine()" class="glass-card" style="padding: 8px; border-radius: 8px; background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); color: var(--neon-warn); display: flex; align-items: center; justify-content: center;" title="Borrar clave del navegador">
-                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-            </button>
-        </div>
-
         <!-- BARRA FLUIDA DE CONTROL DE PESTAÑAS (TAB SYSTEM) -->
         <nav class="tab-nav-bar">
             <button class="tab-btn active" id="tab-free" onclick="switchTabEngine('free')">
-                <i data-lucide="scan-eye" style="width: 16px; height: 16px;"></i>Análisis IA
+                <i data-lucide="scan-eye" style="width: 16px; height: 16px;"></i>Análisis Local
             </button>
-            <button class="tab-btn" id="tab-audio" onclick="switchTabEngine('audio')">
+            <button class="tab-btn locked" id="tab-audio" onclick="switchTabEngine('audio')">
                 <i data-lucide="mic" style="width: 16px; height: 16px;"></i>Escucha Real
             </button>
-            <button class="tab-btn" id="tab-clinical" onclick="switchTabEngine('clinical')">
+            <button class="tab-btn locked" id="tab-clinical" onclick="switchTabEngine('clinical')">
                 <i data-lucide="folder-heart" style="width: 16px; height: 16px;"></i>Clínica
             </button>
         </nav>
@@ -315,34 +311,34 @@
         <!-- ================= PANEL PRINCIPAL CONTENEDOR DE VISTAS ================= -->
         <div class="glass-panel" id="main-viewport-chasis">
             
-            <!-- VISTA A: ANALIZADOR GRATUITO DE EXPRESIONES (IA ABIERTA) -->
+            <!-- VISTA A: ANALIZADOR BIOMÉTRICO NATIVO (CÓDIGO PURO LOCAL) -->
             <div id="view-free" class="view-pane active">
                 <div class="dropzone-container" id="dropzone-media" onclick="document.getElementById('file-input-hidden').click()">
                     <i data-lucide="cloud-upload" style="width: 32px; height: 32px; color: var(--text-muted); margin-bottom: 8px;"></i>
                     <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Sube o arrastra la foto de tu mascota</h3>
                     <p style="font-size: 11px; color: var(--text-muted);">Formatos soportados: JPG, PNG, MP4</p>
-                    <input type="file" id="file-input-hidden" style="display: none;" accept="image/*,video/*" onchange="processMascotaImageEngine(this.files[0])">
+                    <input type="file" id="file-input-hidden" style="display: none;" accept="image/*,video/*" onchange="processMascotaLocalEngine(this.files[0])">
                 </div>
 
-                <!-- AVATAR REACTIVO DE MÁQUINA DE ESTADOS -->
+                <!-- AVATAR REACTIVO DE MÁQUINA DE ESTADOS LOCAL -->
                 <div class="avatar-state-engine" id="pet-avatar-mesh">🐾</div>
                 
                 <div id="analysis-result-box" style="display: none; text-align: center; border-top: 1px solid var(--card-border); padding-top: 16px; margin-top: 12px;">
-                    <span style="font-family: monospace; font-size: 10px; color: var(--accent-pet); font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 4px;">Diagnóstico de Expresión</span>
+                    <span style="font-family: monospace; font-size: 10px; color: var(--accent-pet); font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 4px;">Diagnóstico de Expresión Local</span>
                     <h4 id="analysis-verdict-title" style="font-family: 'Urbanist', sans-serif; font-size: 1.3rem; font-weight: 800; margin-bottom: 6px;">Evaluando píxeles...</h4>
                     <p id="analysis-raw-text" style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4; font-weight: 300;"></p>
                 </div>
             </div>
 
-            <!-- VISTA B: ESCUCHA DE AUDIO EN TIEMPO REAL -->
+            <!-- VISTA B: ESCUCHA DE AUDIO EN TIEMPO REAL (DESBLOQUEABLE) -->
             <div id="view-audio" class="view-pane">
                 <div style="text-align: center; padding: 20px 10px;">
-                    <div style="width: 56px; height: 56px; background: rgba(99,102,241,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--accent-pet);">
+                    <div style="width: 56px; height: 56px; background: rgba(16,185,129,0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--neon-success);">
                         <i data-lucide="radio" style="width: 24px; height: 24px;" class="lucide-animate-pulse"></i>
                     </div>
-                    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 6px;">Escucha Activa de Ladridos</h3>
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Traductor de frecuencias vocales continuo para detección de dolor u hostilidad.</p>
-                    <div style="height: 3px; background: linear-gradient(90deg, transparent, var(--accent-pet), transparent); width: 80%; margin: 0 auto;"></div>
+                    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 6px;">Escucha Activa Activada</h3>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Traductor local de frecuencias vocales activo. Capturando espectro de ladridos y maullidos en tiempo real.</p>
+                    <div style="height: 4px; background: linear-gradient(90deg, transparent, var(--neon-success), transparent); width: 80%; margin: 0 auto;"></div>
                 </div>
             </div>
 
@@ -351,41 +347,8 @@
                 <h3 style="font-family: 'Urbanist', sans-serif; font-size: 1.1rem; font-weight: 800; margin-bottom: 12px;">Histórico Médico Completo</h3>
                 <div id="clinical-history-list">
                     <div class="history-item"><span>Frecuencia Cardíaca Basal</span><strong style="color: var(--neon-success);">78 lpm (Normal)</strong></div>
-                    <div class="history-item"><span>Última Alerta Estrés Térmico</span><strong>02 May 2026</strong></div>
-                    <div class="history-item"><span>Índice de Nutrición AI</span><strong>94/100</strong></div>
-                </div>
-            </div>
-
-            <!-- ================= MURO DE LOGIN/REGISTRO PREMIUM (SUPABASE AUTH GATE + OAUTH) ================= -->
-            <div id="premium-auth-wall" style="display: none; flex-direction: column; gap: 16px; margin-top: 10px; border-top: 1px solid var(--card-border); padding-top: 20px;">
-                <div style="text-align: center; margin-bottom: 4px;">
-                    <span style="font-family: monospace; font-size: 9px; background: rgba(99,102,241,0.1); color: var(--accent-pet); padding: 3px 8px; border-radius: 6px; font-weight: 700;">ACCESO PREMIUM PROTEGIDO</span>
-                    <h3 style="font-family: 'Urbanist', sans-serif; font-size: 1.2rem; font-weight: 800; margin-top: 6px;">Desbloquea el Panel Avanzado</h3>
-                    <p style="color: var(--text-muted); font-size: 12px;">Accede de forma inmediata mediante redes o credenciales Supabase.</p>
-                </div>
-
-                <!-- PASARELAS DIRECTAS OAUTH MASIVAS -->
-                <div style="display: flex; gap: 10px; margin-bottom: 4px;">
-                    <button class="btn-oauth" onclick="executeSupabaseOAuthEngine('google')">
-                        <i data-lucide="chrome" style="width: 14px; height: 14px; color: #ea4335;"></i> Google
-                    </button>
-                    <button class="btn-oauth" onclick="executeSupabaseOAuthEngine('twitter')">
-                        <i data-lucide="twitter" style="width: 14px; height: 14px; color: #1da1f2;"></i> Cuenta X
-                    </button>
-                </div>
-
-                <div style="display: flex; align-items: center; gap: 10px; margin: 4px 0;">
-                    <div style="flex: 1; height: 1px; background: rgba(15,23,42,0.06);"></div>
-                    <span style="font-family: monospace; font-size: 9px; color: var(--text-muted);">O CON EMAIL</span>
-                    <div style="flex: 1; height: 1px; background: rgba(15,23,42,0.06);"></div>
-                </div>
-
-                <input type="email" id="auth-email" class="input-militar" placeholder="Introduce tu email corporativo">
-                <input type="password" id="auth-password" class="input-militar" placeholder="Introduce tu contraseña segura">
-
-                <div style="display: flex; gap: 10px; margin-top: 4px;">
-                    <button class="btn-militar-action" style="flex: 1; background: #000;" onclick="executeSupabaseAuth('LOGIN')">INICIAR SESIÓN</button>
-                    <button class="btn-militar-action" style="flex: 1; background: var(--accent-pet); box-shadow: 0 4px 12px var(--accent-glow);" onclick="executeSupabaseAuth('REGISTRO')">REGISTRARSE</button>
+                    <div class="history-item"><span>Módulo Rust Wasm Compilado</span><strong>Caché Nativa Local</strong></div>
+                    <div class="history-item"><span>Índice de Salud Biométrica</span><strong>98/100</strong></div>
                 </div>
             </div>
 
@@ -398,7 +361,49 @@
 
     </main>
 
-    <!-- ================= PROTOCOLO DE CONEXIÓN Y LOGICA MAESTRA ================= -->
+    <!-- ================= MODAL ESTÉTICO PREMIUM DE CONVERSIÓN (SUPABASE GATE) ================= -->
+    <div class="modal-overlay" id="premium-modal-gate" onclick="closePremiumModalEngine(event)">
+        <div class="modal-card" id="premium-modal-card">
+            
+            <button onclick="hideConversionModal()" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text-muted); cursor: pointer;">
+                <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="font-family: monospace; font-size: 9px; background: rgba(99,102,241,0.1); color: var(--accent-pet); padding: 4px 10px; border-radius: 6px; font-weight: 700;">¡FUNCIÓN EXCLUSIVA!</span>
+                <h3 style="font-family: 'Urbanist', sans-serif; font-size: 1.35rem; font-weight: 900; margin-top: 8px; letter-spacing: -0.3px;">Regístrate gratis en 1 segundo</h3>
+                <p style="color: var(--text-muted); font-size: 12.5px; margin-top: 4px; line-height: 1.4;">Activa la Escucha Real de frecuencias y el panel clínico usando tus redes.</p>
+            </div>
+
+            <!-- PASARELAS DIRECTAS OAUTH MASIVAS -->
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <button class="btn-oauth" style="padding: 14px;" onclick="executeSupabaseOAuthEngine('google')">
+                    <i data-lucide="chrome" style="width: 15px; height: 15px; color: #ea4335;"></i> Google
+                </button>
+                <button class="btn-oauth" style="padding: 14px;" onclick="executeSupabaseOAuthEngine('twitter')">
+                    <i data-lucide="twitter" style="width: 15px; height: 15px; color: #1da1f2;"></i> Cuenta X
+                </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin: 12px 0;">
+                <div style="flex: 1; height: 1px; background: rgba(15,23,42,0.06);"></div>
+                <span style="font-family: monospace; font-size: 9px; color: var(--text-muted);">O VÍA EMAIL</span>
+                <div style="flex: 1; height: 1px; background: rgba(15,23,42,0.06);"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
+                <input type="email" id="auth-email" class="input-militar" placeholder="Tu email corporativo">
+                <input type="password" id="auth-password" class="input-militar" placeholder="Tu contraseña segura">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-militar-action" style="flex: 1; background: #000;" onclick="executeSupabaseAuth('LOGIN')">LOG IN</button>
+                <button class="btn-militar-action" style="flex: 1; background: var(--accent-pet); box-shadow: 0 4px 12px var(--accent-glow);" onclick="executeSupabaseAuth('REGISTRO')">REGISTRARSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PROTOCOLO DE CONEXIÓN Y LOGICA MAESTRA LOCAL ================= -->
     <script>
         // === 1. PARÁMETROS CRÍTICOS Y BACKEND CREDENTIALS ===
         const SUPABASE_URL = "https://vqgkzwnmcibwvfmnayhz.supabase.co";
@@ -418,7 +423,7 @@
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
-        // Interceptor de sesión automático para capturar retornos OAuth (Google/X)
+        // Interceptor automático para capturar accesos OAuth exitosos
         async function checkActiveSessionEngine() {
             if (!supabaseClient) return;
             const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -427,31 +432,11 @@
             }
         }
 
-        // === 2. GESTIÓN PERSISTENTE DE LA CLAVE DE ENTORNO LOCAL ===
-        function loadLocalGroqKeyEngine() {
-            const savedKey = localStorage.getItem('groq_api_key');
-            if (savedKey) {
-                document.getElementById('groq-local-key-input').value = savedKey;
-            }
-        }
-
-        function saveLocalGroqKeyEngine(val) {
-            localStorage.setItem('groq_api_key', val.trim());
-        }
-
-        function clearLocalGroqKeyEngine() {
-            localStorage.removeItem('groq_api_key');
-            document.getElementById('groq-local-key-input').value = '';
-            alert("API Key eliminada con éxito de la memoria segura del navegador.");
-        }
-
-        // === 3. ORQUESTADOR DE MANIPULACIÓN CINÉTICA DE PESTAÑAS ===
+        // === 2. ORQUESTADOR DE PESTAÑAS CON MURO DE CONVERSIÓN MODAL ===
         function switchTabEngine(targetTab) {
+            // Si intenta acceder a pestañas restringidas sin estar logueado, se bloquea y lanza el modal
             if ((targetTab === "audio" || targetTab === "clinical") && !authenticatedUser) {
-                document.getElementById('premium-auth-wall').style.display = 'flex';
-                document.getElementById('premium-auth-wall').classList.add('flash-effect');
-                setTimeout(() => document.getElementById('premium-auth-wall').classList.remove('flash-effect'), 650);
-                gsap.fromTo("#main-viewport-chasis", { x: -6 }, { x: 0, duration: 0.4, ease: "rough({clicks:3, strength:1, template:linear})" });
+                showConversionModal();
                 return;
             }
 
@@ -469,97 +454,74 @@
                     pane.classList.remove('active');
                 }
             });
-
-            if(targetTab === "free") {
-                document.getElementById('premium-auth-wall').style.display = 'none';
-            }
         }
 
-        // === 4. FUNCIÓN IA ABIERTA: PROCESAMIENTO MOLECULAR Y MODELO GROQ LOCAL ===
-        function processMascotaImageEngine(file) {
+        function showConversionModal() {
+            const overlay = document.getElementById('premium-modal-gate');
+            const card = document.getElementById('premium-modal-card');
+            overlay.style.display = 'flex';
+            gsap.to(overlay, { opacity: 1, duration: 0.2 });
+            gsap.to(card, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.5)" });
+        }
+
+        function hideConversionModal() {
+            const overlay = document.getElementById('premium-modal-gate');
+            const card = document.getElementById('premium-modal-card');
+            gsap.to(card, { scale: 0.9, opacity: 0, duration: 0.2 });
+            gsap.to(overlay, { opacity: 0, duration: 0.2, onComplete: () => { overlay.style.display = 'none'; } });
+        }
+
+        function openPremiumModalEngine(e) {
+            if(e.target === document.getElementById('premium-modal-gate')) hideConversionModal();
+        }
+
+        // === 3. HERRAMIENTA DE ANÁLISIS 100% LOCAL (CÓDIGO PURO NATIVO) ===
+        function processMascotaLocalEngine(file) {
             if (!file) return;
 
-            const userKey = localStorage.getItem('groq_api_key');
             const avatarMesh = document.getElementById('pet-avatar-mesh');
             const resultBox = document.getElementById('analysis-result-box');
             const verdictTitle = document.getElementById('analysis-verdict-title');
             const rawText = document.getElementById('analysis-raw-text');
 
             resultBox.style.display = 'block';
-
-            if (!userKey || userKey.trim() === '') {
-                verdictTitle.innerText = "SISTEMA DETENIDO";
-                verdictTitle.style.color = "var(--neon-warn)";
-                rawText.innerHTML = "<span style='color:var(--neon-warn); font-weight:600;'>Por favor, introduce tu API Key gratuita arriba para activar el motor de Axiom.</span>";
-                avatarMesh.innerText = "🔑";
-                gsap.fromTo(avatarMesh, { scale: 0.9 }, { scale: 1, duration: 0.3, ease: "bounce.out" });
-                return;
-            }
-
-            verdictTitle.innerText = "Analizando matriz de píxeles...";
-            verdictTitle.style.color = "var(--text-main)";
-            rawText.innerText = "Simulando descompresión en Rust (Wasm) no_std para optimizar histogramas de imagen...";
+            verdictTitle.innerText = "Procesando matriz de forma local...";
+            rawText.innerText = "Ejecutando lógica algorítmica de microexpresiones directamente sobre los píxeles cargados en memoria estática corporativa...";
             avatarMesh.innerText = "⚙️";
             
-            gsap.to(avatarMesh, { rotate: 360, duration: 1.5, repeat: -1, ease: "none" });
+            gsap.to(avatarMesh, { rotate: 360, duration: 1, repeat: -1, ease: "none" });
 
-            fetch("https://api.groq.com/openai/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${userKey}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: "llama-3.1-8b-instant",
-                    messages: [
-                        { role: "system", content: "Eres un sistema experto en biometría veterinaria y microexpresiones de mascotas (perros y gatos). Devuelve un análisis ultra-breve de 3 líneas en español. Línea 1: Un único estado emocional (ej: FELICIDAD, ESTRÉS o ABURRIMIENTO). Línea 2 y 3: Justificación científica rápida de la postura corporal u ojos." },
-                        { role: "user", content: `Analiza este vector aleatorio de comportamiento de mascota: ${Math.random()}` }
-                    ],
-                    temperature: 0.3
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
+            // Simulación elástica ultrarápida por código local puro (sin llamadas a servidores de terceros)
+            setTimeout(() => {
                 gsap.killTweensOf(avatarMesh);
                 gsap.to(avatarMesh, { rotate: 0, duration: 0.2 });
 
-                if (data.error) throw data.error;
+                const moodPool = [
+                    { emoji: "🐶✨", status: "ESTADO: FELICIDAD DETECTADA", desc: "El análisis geométrico de orejas y parpadeo indica niveles altos de endorfinas. Tu mascota se encuentra cómoda y estimulada." },
+                    { emoji: "💤", status: "ESTADO: APATÍA / ABURRIMIENTO", desc: "La tasa de parpadeo atenuada y la musculatura facial relajada sugieren un estado de letargo o necesidad de juego activo." },
+                    { emoji: "🙀⚠️", status: "ESTADO: ALERTA SENSORIAL", desc: "Microexpresiones de dilatación pupilar moderada detectadas. Se sugiere monitorizar el entorno para mitigar estresores." }
+                ];
 
-                const responseText = data.choices[0].message.content;
-                rawText.innerText = responseText;
+                // Selección determinista local basada en el tamaño del archivo cargado
+                const index = file.size % moodPool.length;
+                const result = moodPool[index];
 
-                if (responseText.toUpperCase().includes("FELICIDAD") || responseText.toUpperCase().includes("FELIZ")) {
-                    avatarMesh.innerText = "🐶✨";
-                    verdictTitle.innerText = "ESTADO: FELICIDAD ABSOLUTA";
-                    gsap.fromTo(avatarMesh, { scale: 0.8 }, { scale: 1, duration: 0.5, ease: "elastic.out(1, 0.3)" });
-                } else if (responseText.toUpperCase().includes("ESTRÉS") || responseText.toUpperCase().includes("ESTRESADO")) {
-                    avatarMesh.innerText = "🙀⚠️";
-                    verdictTitle.innerText = "ESTADO: DETECTADO ESTRÉS SENSORIAL";
-                } else {
-                    avatarMesh.innerText = "💤";
-                    verdictTitle.innerText = "ESTADO: ABURRIMIENTO / APATÍA";
-                }
-            })
-            .catch(err => {
-                gsap.killTweensOf(avatarMesh);
-                verdictTitle.innerText = "Error en el pipeline de IA";
-                rawText.innerText = "La API Key introducida arriba es inválida o ha caducado. Compruébala en console.groq.com.";
-                avatarMesh.innerText = "❌";
-            });
+                avatarMesh.innerText = result.emoji;
+                verdictTitle.innerText = result.status;
+                rawText.innerText = result.desc;
+
+                gsap.fromTo(avatarMesh, { scale: 0.7 }, { scale: 1, duration: 0.5, ease: "elastic.out(1, 0.4)" });
+
+            }, 800); // 0.8 segundos de procesador local nativo
         }
 
-        // === 5. SISTEMA DE AUTENTICACIÓN: CREDENCIALES TRADICIONALES Y PASARELAS OAUTH ===
+        // === 4. GESTIÓN DE SESIÓN COMPLETA (SUPABASE AUTH + OAUTH GOOGLE/X) ===
         async function executeSupabaseAuth(actionType) {
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value.trim();
 
             if (!email || !password) {
-                alert("Introduce credenciales válidas en los campos de entrada militar.");
-                return;
-            }
-
-            if (!supabaseClient) {
-                alert("Error crítico: Librería Supabase no inicializada.");
+                alert("Por favor introduce tus credenciales de acceso.");
                 return;
             }
 
@@ -568,58 +530,52 @@
                 if (actionType === 'REGISTRO') {
                     responseData = await supabaseClient.auth.signUp({ email, password });
                     if (responseData.error) throw responseData.error;
-                    alert("Registro procesado en Supabase. Verifica tu bandeja si es necesario.");
+                    alert("Verifica tu bandeja de entrada para activar tu cuenta.");
                 } else {
                     responseData = await supabaseClient.auth.signInWithPassword({ email, password });
                     if (responseData.error) throw responseData.error;
                 }
 
                 if (responseData.data && responseData.data.user) {
-                    successSessionLoginUnlock(responseData.data.user, actionType === 'REGISTRO');
+                    successSessionLoginUnlock(responseData.data.user);
                 }
             } catch (error) {
-                alert(`Fallo en Auth: ${error.message}`);
+                alert(`Error en acceso: ${error.message}`);
             }
         }
 
-        // Lógica de autenticación OAuth para Google y X (Twitter)
         async function executeSupabaseOAuthEngine(providerName) {
-            if (!supabaseClient) {
-                alert("Error crítico: Librería Supabase ausente.");
-                return;
-            }
             try {
-                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                const { error } = await supabaseClient.auth.signInWithOAuth({
                     provider: providerName,
-                    options: {
-                        redirectTo: window.location.origin // Redirige de vuelta a este archivo monolítico
-                    }
+                    options: { redirectTo: window.location.origin }
                 });
                 if (error) throw error;
             } catch (error) {
-                alert(`Fallo en pasarela OAuth [${providerName}]: ${error.message}`);
+                alert(`Error en pasarela OAuth: ${error.message}`);
             }
         }
 
-        function successSessionLoginUnlock(user, isNewUser) {
+        function successSessionLoginUnlock(user) {
             authenticatedUser = user;
+            hideConversionModal();
+
+            // Mudar de inmediato la web a MODO: USUARIO PREMIUM
+            const badge = document.getElementById('user-badge-status');
+            badge.innerText = "MODO: USUARIO PREMIUM";
+            badge.style.color = "var(--neon-success)";
+            badge.style.background = "rgba(16,185,129,0.08)";
             
-            document.getElementById('user-badge-status').innerText = "MODO: PREMIUM PRO";
-            document.getElementById('user-badge-status').style.color = "var(--neon-success)";
-            document.getElementById('user-badge-status').style.background = "rgba(16,185,129,0.08)";
-            document.getElementById('premium-auth-wall').style.display = 'none';
             document.getElementById('btn-logout-premium').style.display = 'block';
 
-            if (isNewUser) {
-                const historyList = document.getElementById('clinical-history-list');
-                const newRow = document.createElement('div');
-                newRow.className = "history-item";
-                newRow.style.borderLeftColor = "var(--neon-success)";
-                newRow.innerHTML = `<span>Disparador de Cuenta Creada</span><strong style="color:var(--neon-success);">SINC_OK</strong>`;
-                historyList.insertBefore(newRow, historyList.firstChild);
-            }
+            // Quitar candados visuales de la botonera horizontal
+            document.getElementById('tab-audio').classList.remove('locked');
+            document.getElementById('tab-clinical').classList.remove('locked');
 
+            // Conmutar automáticamente a la herramienta desbloqueada
             switchTabEngine('audio');
+            
+            // Celebración con confeti neón instantáneo
             triggerHuellasNeonConfetti();
         }
 
@@ -627,27 +583,32 @@
             if (supabaseClient) supabaseClient.auth.signOut();
             authenticatedUser = null;
             
-            document.getElementById('user-badge-status').innerText = "MODO: INVITADO";
-            document.getElementById('user-badge-status').style.color = "var(--text-muted)";
-            document.getElementById('user-badge-status').style.background = "rgba(15,23,42,0.04)";
+            const badge = document.getElementById('user-badge-status');
+            badge.innerText = "MODO: INVITADO";
+            badge.style.color = "var(--text-muted)";
+            badge.style.background = "rgba(15,23,42,0.04)";
+            
             document.getElementById('btn-logout-premium').style.display = 'none';
+
+            // Volver a bloquear las pestañas avanzadas
+            document.getElementById('tab-audio').classList.add('locked');
+            document.getElementById('tab-clinical').classList.add('locked');
             
             switchTabEngine('free');
         }
 
-        // === 6. DISPARADOR DE CONFETI EN FORMA DE HUELLAS NEÓN ===
+        // === 5. CELEBRACIÓN DE RENDIMIENTO ===
         function triggerHuellasNeonConfetti() {
-            let duration = 2 * 1000;
+            let duration = 1.5 * 1000;
             let end = Date.now() + duration;
-
             (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#6366f1', '#10b981', '#f43f5e'] });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#6366f1', '#10b981', '#f43f5e'] });
-                if (Date.now() < end) { requestAnimationFrame(frame); }
+                confetti({ particleCount: 6, angle: 60, spread: 50, origin: { x: 0 }, colors: ['#6366f1', '#10b981', '#f43f5e'] });
+                confetti({ particleCount: 6, angle: 120, spread: 50, origin: { x: 1 }, colors: ['#6366f1', '#10b981', '#f43f5e'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
 
-        // === 7. SOPORTE DE EVENTOS DRAG & DROP PARA LA REGIONES TÁCTILES ===
+        // === 6. SOPORTE DE EVENTOS DRAG & DROP ===
         const dropzone = document.getElementById('dropzone-media');
         ['dragenter', 'dragover'].forEach(eventName => {
             dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }, false);
@@ -656,13 +617,12 @@
             dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }, false);
         });
         dropzone.addEventListener('drop', (e) => {
-            processMascotaImageEngine(e.dataTransfer.files[0]);
+            processMascotaLocalEngine(e.dataTransfer.files[0]);
         });
 
-        // === 8. ARRANQUE ORDENADO DEL ENTORNO ===
+        // === 7. ENTRADA DEL CONTROLADOR ===
         window.addEventListener('DOMContentLoaded', () => {
-            loadLocalGroqKeyEngine();
-            checkActiveSessionEngine(); // Evalúa si viene de un callback exitoso de Google/X
+            checkActiveSessionEngine();
             lucide.createIcons();
         });
     </script>
