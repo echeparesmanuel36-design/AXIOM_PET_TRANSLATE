@@ -26,6 +26,7 @@
             --accent-pet: #6366f1;
             --accent-glow: rgba(99, 102, 241, 0.15);
             --neon-success: #10b981;
+            --neon-warn: #ef4444;
         }
 
         /* === RESETEO Y PROTECCIÓN DE HILOS GPU === */
@@ -76,6 +77,18 @@
             transform: translateZ(0); /* Forzado GPU */
             position: relative;
             overflow: hidden;
+        }
+
+        /* HUD Descentralizado para la Clave API */
+        .api-key-hud {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 8px 12px;
+            border-radius: 16px;
+            margin-bottom: 16px;
         }
 
         .tab-nav-bar {
@@ -226,7 +239,7 @@
 
     <main>
         
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <div style="width: 36px; height: 36px; background: var(--text-main); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff;">
                     <i data-lucide="heart-pulse" style="width: 18px; height: 18px;"></i>
@@ -240,6 +253,19 @@
                 MODO: INVITADO
             </div>
         </header>
+
+        <div class="api-key-hud glass-panel" style="padding: 10px 14px; border-radius: 16px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                <label style="font-size: 10px; font-family: monospace; font-weight: bold; color: var(--text-muted); display: flex; justify-content: space-between;">
+                    <span>API KEY DE GROQ (DE ENTORNO LOCAL)</span>
+                    <a href="https://console.groq.com" target="_blank" style="color: var(--accent-pet); text-decoration: none;">Consíguela gratis aquí ↗</a>
+                </label>
+                <input type="password" id="groq-local-key-input" style="background: transparent; border: none; outline: none; font-family: monospace; font-size: 12px; color: var(--text-main); width: 100%;" placeholder="Introduce tu gsk_ API Key..." oninput="saveLocalGroqKeyEngine(this.value)">
+            </div>
+            <button onclick="clearLocalGroqKeyEngine()" class="glass-card" style="padding: 8px; border-radius: 8px; background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.15); color: var(--neon-warn); display: flex; align-items: center; justify-content: center;" title="Borrar clave del navegador">
+                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+            </button>
+        </div>
 
         <nav class="tab-nav-bar">
             <button class="tab-btn active" id="tab-free" onclick="switchTabEngine('free')">
@@ -317,10 +343,9 @@
     </main>
 
     <script>
-        // === 1. PARÁMETROS CRÍTICOS Y ASSET PIPELINE CREDENTIALS ===
+        // === 1. PARÁMETROS CRÍTICOS Y BACKEND CREDENTIALS ===
         const SUPABASE_URL = "https://vqgkzwnmcibwvfmnayhz.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_sSj75-J8cNKcyWROx74lRA_f-JvZCJS";
-        const GROQ_API_KEY = "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";
         
         let supabaseClient = null;
         let authenticatedUser = null;
@@ -336,23 +361,36 @@
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
-        // === 2. ORQUESTADOR DE MANIPULACIÓN CINÉTICA DE PESTAÑAS (TAB ENGINE) ===
+        // === 2. GESTIÓN PERSISTENTE DE LA CLAVE DE ENTORNO LOCAL (LOCALSTORAGE) ===
+        function loadLocalGroqKeyEngine() {
+            const savedKey = localStorage.getItem('groq_api_key');
+            if (savedKey) {
+                document.getElementById('groq-local-key-input').value = savedKey;
+            }
+        }
+
+        function saveLocalGroqKeyEngine(val) {
+            localStorage.setItem('groq_api_key', val.trim());
+        }
+
+        function clearLocalGroqKeyEngine() {
+            localStorage.removeItem('groq_api_key');
+            document.getElementById('groq-local-key-input').value = '';
+            alert("API Key eliminada con éxito de la memoria segura del navegador.");
+        }
+
+        // === 3. ORQUESTADOR DE MANIPULACIÓN CINÉTICA DE PESTAÑAS (TAB ENGINE) ===
         function switchTabEngine(targetTab) {
-            // Regla de bloqueo estricta: Si intenta ir a Audio o Clínica sin estar autenticado, se impone el muro
             if ((targetTab === "audio" || targetTab === "clinical") && !authenticatedUser) {
-                // Forzar activación visual del botón premium e inyectar efecto reflejo
                 document.getElementById('premium-auth-wall').style.display = 'flex';
                 document.getElementById('premium-auth-wall').classList.add('flash-effect');
                 setTimeout(() => document.getElementById('premium-auth-wall').classList.remove('flash-effect'), 650);
-                
-                // Animación de muelle GSAP sacudiendo el chasis para avisar de restricción
                 gsap.fromTo("#main-viewport-chasis", { x: -6 }, { x: 0, duration: 0.4, ease: "rough({clicks:3, strength:1, template:linear})" });
                 return;
             }
 
             currentActiveTab = targetTab;
             
-            // Ciclar botones de navegación
             ['free', 'audio', 'clinical'].forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
                 const pane = document.getElementById(`view-${t}`);
@@ -366,36 +404,45 @@
                 }
             });
 
-            // Ocultar muro si está en la zona libre
             if(targetTab === "free") {
                 document.getElementById('premium-auth-wall').style.display = 'none';
             }
         }
 
-        // === 3. FUNCIÓN IA ABIERTA: PROCESAMIENTO MOLECULAR Y MODELO GROQ ===
+        // === 4. FUNCIÓN IA ABIERTA: PROCESAMIENTO MOLECULAR Y MODELO GROQ LOCAL ===
         function processMascotaImageEngine(file) {
             if (!file) return;
 
+            const userKey = localStorage.getItem('groq_api_key');
             const avatarMesh = document.getElementById('pet-avatar-mesh');
             const resultBox = document.getElementById('analysis-result-box');
             const verdictTitle = document.getElementById('analysis-verdict-title');
             const rawText = document.getElementById('analysis-raw-text');
 
             resultBox.style.display = 'block';
+
+            // Guardia de seguridad: Si no hay clave en localStorage, frena la ejecución
+            if (!userKey || userKey.trim() === '') {
+                verdictTitle.innerText = "SISTEMA DETENIDO";
+                verdictTitle.style.color = "var(--neon-warn)";
+                rawText.innerHTML = "<span style='color:var(--neon-warn); font-weight:600;'>Por favor, introduce tu API Key gratuita arriba para activar el motor de Axiom.</span>";
+                avatarMesh.innerText = "🔑";
+                gsap.fromTo(avatarMesh, { scale: 0.9 }, { scale: 1, duration: 0.3, ease: "bounce.out" });
+                return;
+            }
+
             verdictTitle.innerText = "Analizando matriz de píxeles...";
+            verdictTitle.style.color = "var(--text-main)";
             rawText.innerText = "Simulando descompresión en Rust (Wasm) no_std para optimizar histogramas de imagen...";
             avatarMesh.innerText = "⚙️";
             
-            // Animación rotativa de carga en el avatar
             gsap.to(avatarMesh, { rotate: 360, duration: 1.5, repeat: -1, ease: "none" });
 
-            // Simulación de paso de píxeles por Wasm y llamada directa a Groq Cloud
-            // Puesto que es una llamada fetch directa desde JS a Groq (sin soporte de archivos binarios puros directamente en la API de chat básica sin codificación base64 masiva), inyectamos un prompt de visión analítica basado en simulación biométrica estocástica.
-            
+            // Canalización del prompt analítico adaptado hacia el modelo Groq descentralizado
             fetch("https://api.groq.com/openai/v1/chat/completions", {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${GROQ_API_KEY}`,
+                    "Authorization": `Bearer ${userKey}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
@@ -412,10 +459,11 @@
                 gsap.killTweensOf(avatarMesh);
                 gsap.to(avatarMesh, { rotate: 0, duration: 0.2 });
 
+                if (data.error) throw data.error;
+
                 const responseText = data.choices[0].message.content;
                 rawText.innerText = responseText;
 
-                // Modificación interactiva del avatar según el diagnóstico deductivo
                 if (responseText.toUpperCase().includes("FELICIDAD") || responseText.toUpperCase().includes("FELIZ")) {
                     avatarMesh.innerText = "🐶✨";
                     verdictTitle.innerText = "ESTADO: FELICIDAD ABSOLUTA";
@@ -431,12 +479,12 @@
             .catch(err => {
                 gsap.killTweensOf(avatarMesh);
                 verdictTitle.innerText = "Error en el pipeline de IA";
-                rawText.innerText = "Comprueba tu clave o la conexión de red del endpoint de Groq.";
+                rawText.innerText = "La API Key introducida arriba es inválida o ha caducado. Compruébala en console.groq.com.";
                 avatarMesh.innerText = "❌";
             });
         }
 
-        // === 4. SISTEMA DE AUTENTICACIÓN PREMIUM DE SUPABASE GATE ===
+        // === 5. SISTEMA DE AUTENTICACIÓN PREMIUM DE SUPABASE GATE ===
         async function executeSupabaseAuth(actionType) {
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value.trim();
@@ -473,14 +521,12 @@
         function successSessionLoginUnlock(user, isNewUser) {
             authenticatedUser = user;
             
-            // Actualización del DOM e inyección AutoAnimate Mock
             document.getElementById('user-badge-status').innerText = "MODO: PREMIUM PRO";
             document.getElementById('user-badge-status').style.color = "var(--neon-success)";
             document.getElementById('user-badge-status').style.background = "rgba(16,185,129,0.08)";
             document.getElementById('premium-auth-wall').style.display = 'none';
             document.getElementById('btn-logout-premium').style.display = 'block';
 
-            // AutoAnimate: Reordenar dinámicamente elementos de la clínica médica añadiendo registros
             if (isNewUser) {
                 const historyList = document.getElementById('clinical-history-list');
                 const newRow = document.createElement('div');
@@ -490,10 +536,7 @@
                 historyList.insertBefore(newRow, historyList.firstChild);
             }
 
-            // Forzar navegación hacia la pestaña que el usuario quería ver originalmente
             switchTabEngine('audio');
-
-            // Detonación de micro-recompensa: Confeti de Huellas Neón
             triggerHuellasNeonConfetti();
         }
 
@@ -509,7 +552,7 @@
             switchTabEngine('free');
         }
 
-        // === 5. DISPARADOR DE CONFETI EN FORMA DE HUELLAS NEÓN ===
+        // === 6. DISPARADOR DE CONFETI EN FORMA DE HUELLAS NEÓN ===
         function triggerHuellasNeonConfetti() {
             let duration = 2 * 1000;
             let end = Date.now() + duration;
@@ -521,7 +564,7 @@
             }());
         }
 
-        // === 6. SOPORTE DE EVENTOS DRAG & DROP PARA LA REGIONES TÁCTILES ===
+        // === 7. SOPORTE DE EVENTOS DRAG & DROP PARA LA REGIONES TÁCTILES ===
         const dropzone = document.getElementById('dropzone-media');
         ['dragenter', 'dragover'].forEach(eventName => {
             dropzone.addEventListener(eventName, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }, false);
@@ -533,8 +576,11 @@
             processMascotaImageEngine(e.dataTransfer.files[0]);
         });
 
-        // Carga síncrona de iconografía militar/limpia
-        lucide.createIcons();
+        // === 8. ARRANQUE ORDENADO DEL ENTORNO ===
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocalGroqKeyEngine();
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
