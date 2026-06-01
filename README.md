@@ -1,38 +1,40 @@
-# 🐾 AXIOM_PET_TRANSLATE // Analizador Biométrico y Conductual
+# 🐾 AXIOM_PET_TRANSLATE // Analizador Local y Sistema de Conversión Premium
 
-Plataforma SaaS de uso diario diseñada en un entorno de arquitectura monolítica y distribución de alto rendimiento para el análisis conductual y salud visual de mascotas (perros y gatos). 
+Plataforma SaaS monolítica de alto rendimiento diseñada para el análisis biométrico conductual y de salud en mascotas (perros y gatos). 
 
-El sistema implementa un modelo de acceso híbrido: una zona de procesamiento de imágenes de uso libre mediante infraestructura local descentralizada y un ecosistema de monitorización avanzada protegido bajo pasarelas criptográficas en la nube.
+Esta versión prescinde por completo de APIs de Inteligencia Artificial externas, operando mediante algoritmos de procesamiento locales en el cliente (*pure native code*) y un embudo de conversión estricto basado en microinteracciones y bloqueos de seguridad.
 
 ---
 
 ## 🛠️ Especificaciones Tecnológicas (Pila Core)
 
-La aplicación ha sido construida bajo la filosofía de **cero dependencias pesadas** y un peso crítico de red optimizado, consolidando toda la interfaz en un único archivo autónomo (`index.html`):
+Para garantizar una carga instantánea y máxima ligereza en redes móviles, el sistema se consolida en un único archivo monolítico autónomo (`index.html`) con las siguientes tecnologías:
 
-* **HTML5 Semántico:** Estructura nativa optimizada para la carga de canvas multimedia y manipulación de captura de streams.
-* **CSS3 Ultra-Glass:** Diseño de cristal líquido blanco puro con saturación avanzada (`backdrop-filter: blur(24px) saturate(190%)`) y aceleración por GPU garantizada a 120Hz para eliminar el retraso de refresco táctil.
-* **Vanilla JavaScript (ES6+):** Gestión asíncrona de tokens de sesión, llamadas perimetrales fetch y control estructural del DOM.
-* **Integración de Componentes vía CDN:**
-    * `Supabase Client`: Orquestador de persistencia de bases de datos y seguridad en el cliente.
-    * `GSAP`: Motor físico para microinteracciones elásticas y estados mutables del avatar.
-    * `Lenis`: Desplazamiento táctil y scroll suavizado continuo.
-    * `Canvas-Confetti`: Animación matemática procedural de partículas para hitos de conversión.
+* **HTML5 Semántico:** Estructura limpia optimizada para interactuar con sistemas de archivos y flujos multimedia locales.
+* **CSS3 Ultra-Glass:** Chasis visual premium basado en cristal líquido blanco esmerilado (`backdrop-filter: blur(24px)`) con físicas de refracción óptica y aceleración por GPU.
+* **Vanilla JavaScript (ES6+):** Motor lógico principal encargado del enrutamiento de vistas, cálculo probabilístico estocástico local y gestión de tokens de sesión.
+* **CDNs de Alto Rendimiento:**
+    * `Supabase Client`: Gestión de bases de datos relacionales en la nube y control de acceso.
+    * `GSAP`: Animaciones cinéticas con físicas de muelles (*Spring Physics*) aplicadas al avatar y transiciones del viewport.
+    * `Lenis`: Normalización y suavizado crítico del scroll.
+    * `Canvas-Confetti`: Disparador procedural de partículas neón en forma de huellas para la celebración del alta del usuario.
+
+---
+
+## 🏎️ Embudo de Conversión y Flujo de Autenticación (Supabase Gate)
+
+La aplicación utiliza una estrategia de captación gamificada (*freemium*) dividida en dos estados de privilegios en el DOM:
+
+### 1. Modo Invitado (Acceso Limitado)
+* **Análisis Local:** El usuario puede arrastrar o subir cualquier contenido multimedia al *Dropzone*. El script simula el procesamiento molecular de píxeles y ejecuta un diagnóstico analítico inmediato basado en los metadatos del archivo de forma 100% local.
+* **Bloqueo de Pestañas Avanzadas:** Al intentar conmutar hacia "Escucha Real" o "Clínica", un interceptor lógico congela la navegación, sacude el chasis mediante GSAP y despliega un modal estético *Ultra-Glass* con refracción lumínica.
+* **Login Social (OAuth de un clic):** El modal fuerza al usuario a registrarse o iniciar sesión ofreciendo pasarelas directas para **Google** y **X (Twitter)** integradas de forma nativa a través de Supabase Auth.
+
+### 2. Modo Usuario Premium (Desbloqueo Total)
+* **Captura de Callback de Retorno:** Al inicializar el DOM, la función `checkActiveSessionEngine()` analiza la URL en busca de los tokens devueltos por Google o X. 
+* **Persistencia Directa:** Al validar la sesión, la web muta visualmente a *MODO: USUARIO PREMIUM*, retira los candados de la barra superior de pestañas, libera la "Escucha Real" de audio local y dispara una ráfaga de confeti neón festivo.
 
 ---
 
-## 🏎️ Arquitectura de Seguridad y Flujos Lógicos
-
-### 1. Motor de IA Abierta Descentralizado (Cero Baneos)
-Para mitigar el riesgo de bloqueos automatizados por parte de los bots de escaneo de GitHub, el sistema elimina las API Keys fijas del backend.
-* **Persistencia Local:** Los usuarios inyectan su propia clave gratuita desde el HUD superior. El script la almacena de manera persistente en el navegador usando `localStorage`.
-* **Guardia de Control:** Si la clave está ausente, el pipeline asíncrono mitiga la ejecución, detiene el avatar físico y despliega un aviso estético solicitando la clave. De estar activa, despacha un prompt biométrico al modelo `llama-3.1-8b-instant` de Groq.
-
-### 2. Muro de Pago Premium y Login Social (OAuth Gate)
-Al intentar conmutar hacia las pestañas avanzadas ("Escucha Real de Ladridos" o "Historial Clínico"), un interceptor lógico evalúa el estado del token de usuario.
-* **Bloqueo Reactivo:** Si no hay sesión válida, el chasis se difumina y despliega un formulario *Ultra-Glass* con efectos de refracción óptica (`::before`).
-* **Proveedores OAuth Integrados:** El sistema se comunica nativamente con las APIs de **Google** y **X (Twitter)** configuradas en tu instancia perimetral de Supabase. El inicializador cuenta con la función `checkActiveSessionEngine()` encargada de capturar los callbacks de retorno síncronos en la URL y desbloquear la interfaz en microsegundos sin recargas manuales.
-
----
-<sub>AXIOM SYSTEMS // PET TRANSLATE PIPELINE // OAUTH & LOCAL IA INTEGRATION COMPLETE</sub>
+  <sub>AXIOM SYSTEMS // PET TRANSLATE PURIFIED // 100% LOCAL PROCESSING & OAUTH COMPLETED</sub>
 </p>
